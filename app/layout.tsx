@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { SmoothScrollProvider } from '@/components/SmoothScrollProvider';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   metadataBase: new URL('https://stickerpedia.com'),
   title: {

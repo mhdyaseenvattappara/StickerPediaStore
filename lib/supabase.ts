@@ -1,13 +1,23 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { PrintOrder, Product, ClientAccount, OrderStatus } from './types';
 
-const supabaseUrl =
-  process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
-const supabaseAnonKey =
+const rawUrl =
+  process.env.NEXT_PUBLIC_SUPABASE_URL ||
+  process.env.SUPABASE_URL ||
+  process.env.NEXT_PUBLIC_SUPABASE_ENDPOINT ||
+  '';
+
+const rawAnonKey =
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
   process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
+  process.env.NEXT_PUBLIC_SUPABASE_KEY ||
   process.env.SUPABASE_PUBLISHABLE_KEY ||
-  process.env.SUPABASE_ANON_KEY;
+  process.env.SUPABASE_ANON_KEY ||
+  process.env.SUPABASE_KEY ||
+  '';
+
+const supabaseUrl = rawUrl.trim().replace(/\/+$/, '');
+const supabaseAnonKey = rawAnonKey.trim();
 
 export const isSupabaseConfigured = (): boolean => {
   return Boolean(
@@ -15,16 +25,17 @@ export const isSupabaseConfigured = (): boolean => {
     supabaseAnonKey &&
     supabaseUrl.startsWith('https://') &&
     supabaseAnonKey.length > 15 &&
-    !supabaseUrl.includes('your-project-id')
+    !supabaseUrl.includes('your-project-id') &&
+    !supabaseAnonKey.includes('your_key_here')
   );
 };
 
 // Singleton Supabase Client
 export const supabase: SupabaseClient | null = isSupabaseConfigured()
-  ? createClient(supabaseUrl!, supabaseAnonKey!, {
+  ? createClient(supabaseUrl, supabaseAnonKey, {
       auth: {
-        persistSession: true,
-        autoRefreshToken: true,
+        persistSession: typeof window !== 'undefined',
+        autoRefreshToken: typeof window !== 'undefined',
       },
     })
   : null;

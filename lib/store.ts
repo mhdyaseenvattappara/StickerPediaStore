@@ -445,7 +445,12 @@ export function useStickerStore() {
   const loginAdmin = useCallback((email: string, pass: string): boolean => {
     // Official admin credentials for Sticker.pedia management
     const validEmails = ['admin@sticker.pedia', 'manager@sticker.pedia', 'admin@stickerpedia.com', 'admin'];
-    const validPass = 'stickerpedia2026';
+    const envAdminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL?.trim().toLowerCase();
+    if (envAdminEmail && !validEmails.includes(envAdminEmail)) {
+      validEmails.push(envAdminEmail);
+    }
+    const envAdminPass = process.env.NEXT_PUBLIC_ADMIN_PASS?.trim();
+    const validPass = envAdminPass || 'stickerpedia2026';
 
     const cleanEmail = email.trim().toLowerCase();
     const cleanPass = pass.trim();
